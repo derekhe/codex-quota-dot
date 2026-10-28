@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -22,6 +28,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -38,7 +46,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $prefix = "Codex-Quota-Dot-${{ github.ref_name }}-${{ matrix.label }}"
+          $prefix = "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}"
           Compress-Archive -LiteralPath src-tauri/target/release/codex-quota-dot.exe,LICENSE,THIRD_PARTY_NOTICES.md -DestinationPath "$prefix-portable.zip"
           Copy-Item (Get-ChildItem src-tauri/target/release/bundle/nsis/*-setup.exe | Select-Object -First 1) "$prefix-setup.exe"
           Copy-Item (Get-ChildItem src-tauri/target/release/bundle/msi/*.msi | Select-Object -First 1) "$prefix.msi"
@@ -48,12 +56,13 @@ jobs:
       - name: Create macOS ZIP and checksum
         if: runner.os == 'macOS'
         run: |
-          ditto -c -k --sequesterRsrc --keepParent "src-tauri/target/release/bundle/macos/Codex Quota Dot.app" "Codex-Quota-Dot-${{ github.ref_name }}-${{ matrix.label }}.zip"
-          shasum -a 256 "Codex-Quota-Dot-${{ github.ref_name }}-${{ matrix.label }}.zip" > "Codex-Quota-Dot-${{ github.ref_name }}-${{ matrix.label }}.zip.sha256"
+          ditto -c -k --sequesterRsrc --keepParent "src-tauri/target/release/bundle/macos/Codex Quota Dot.app" "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip"
+          shasum -a 256 "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip" > "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip.sha256"
       - uses: softprops/action-gh-release@v2
         with:
           draft: true
+          tag_name: ${{ inputs.tag || github.ref_name }}
           generate_release_notes: true
-          body_path: docs/release-notes-${{ github.ref_name }}.md
+          body_path: docs/release-notes-${{ inputs.tag || github.ref_name }}.md
           files: |
             Codex-Quota-Dot-*
