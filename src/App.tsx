@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { ChevronDown, Pin, RefreshCw } from "./Icons";
-import { currentMonitor, getCurrentWindow, LogicalSize, PhysicalPosition } from "@tauri-apps/api/window";
+import { availableMonitors, currentMonitor, getCurrentWindow, LogicalSize, PhysicalPosition, primaryMonitor } from "@tauri-apps/api/window";
+import { visiblePosition } from "./utils/windowPosition";
 import "./App.css";
 import { fetchUsage } from "./providers/usageProvider";
 import type { CodexUsageSnapshot } from "./types/usage";
@@ -312,14 +313,35 @@ export default function App() {
   useEffect(() => {
     if (!("__TAURI_INTERNALS__" in window)) return;
     const win = getCurrentWindow();
+    let disposed = false;
+    let checking = false;
+    const ensureVisible = async (saved?: { x: number; y: number }) => {
+      if (checking) return;
+      checking = true;
+      try {
+        const [monitors, primary, size, current] = await Promise.all([
+          availableMonitors(), primaryMonitor(), win.outerSize(), win.outerPosition(),
+        ]);
+        if (disposed || monitors.length === 0) return;
+        const position = saved ?? current;
+        const next = visiblePosition(position, size, monitors.map((monitor) => monitor.workArea), (primary ?? monitors[0]).workArea);
+        if (saved || next.x !== current.x || next.y !== current.y) {
+          await win.setPosition(new PhysicalPosition(next.x, next.y));
+          try { localStorage.setItem(POSITION_KEY, JSON.stringify(next)); } catch { /* Storage is optional. */ }
+        }
+      } catch {
+        // Retry on the next display check if the display configuration is changing.
+      } finally {
+        checking = false;
+      }
+    };
     try {
       const saved = JSON.parse(localStorage.getItem(POSITION_KEY) ?? "null") as { x: number; y: number } | null;
-      if (saved && Number.isFinite(saved.x) && Number.isFinite(saved.y)) {
-        void win.setPosition(new PhysicalPosition(saved.x, saved.y)).catch(() => {});
-      }
+      void ensureVisible(saved && Number.isFinite(saved.x) && Number.isFinite(saved.y) ? saved : undefined);
     } catch {
-      // Ignore invalid position state.
+      void ensureVisible();
     }
+    const displayTimer = window.setInterval(() => void ensureVisible(), 3000);
     let snapTimer: number | null = null;
     const unlisten = win.onMoved(({ payload: position }) => {
       try { localStorage.setItem(POSITION_KEY, JSON.stringify(position)); } catch { /* Storage is optional. */ }
@@ -342,6 +364,8 @@ export default function App() {
       }, 180);
     });
     return () => {
+      disposed = true;
+      window.clearInterval(displayTimer);
       if (snapTimer !== null) window.clearTimeout(snapTimer);
       void unlisten.then((stop) => stop());
     };

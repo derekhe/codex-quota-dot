@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.5] - 2026-10-28
+
+- Restore the quota orb to an active display when its saved display is disconnected.
+- Recover an off-screen orb while the application is running.
+
 ## [0.2.4] - 2026-09-17
 
 - Added credit balance to the compact card, using the existing Codex app-server response and refresh flow.
