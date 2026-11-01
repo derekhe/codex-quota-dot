@@ -42,11 +42,13 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: cargo test --manifest-path src-tauri/Cargo.toml
+        if: matrix.target == ''
       - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --no-deps -- -D warnings
+        if: matrix.target == ''
       - run: npx tauri build ${{ matrix.target && format('--target {0}', matrix.target) || '' }}
       - name: Verify cross-compiled macOS architecture
         if: matrix.target == 'aarch64-apple-darwin'
-        run: lipo -verify_arch arm64 "$RELEASE_DIR/bundle/macos/Codex Quota Dot.app/Contents/MacOS/codex-quota-dot"
+        run: lipo "$RELEASE_DIR/bundle/macos/Codex Quota Dot.app/Contents/MacOS/codex-quota-dot" -verify_arch arm64
       - name: Prepare Windows assets and checksums
         if: runner.os == 'Windows'
         shell: pwsh
