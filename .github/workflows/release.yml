@@ -9,6 +9,10 @@ on:
         description: Release tag to build
         required: true
         type: string
+      platforms:
+        description: Optional JSON matrix for rebuilding selected platforms (os, label, optional target)
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -18,14 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: windows-2025
-            label: windows-x64
-          - os: macos-15
-            label: macos-arm64
-          - os: macos-15-intel
-            label: macos-x64
+        include: ${{ fromJSON(inputs.platforms || '[{"os":"windows-2025","label":"windows-x64"},{"os":"macos-15","label":"macos-arm64"},{"os":"macos-15-intel","label":"macos-x64"}]') }}
     runs-on: ${{ matrix.os }}
+    env:
+      RELEASE_DIR: ${{ matrix.target && format('src-tauri/target/{0}/release', matrix.target) || 'src-tauri/target/release' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,13 +35,18 @@ jobs:
           node-version: 22
           cache: npm
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target || '' }}
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
       - run: cargo test --manifest-path src-tauri/Cargo.toml
       - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --no-deps -- -D warnings
-      - run: npm run tauri build
+      - run: npx tauri build ${{ matrix.target && format('--target {0}', matrix.target) || '' }}
+      - name: Verify cross-compiled macOS architecture
+        if: matrix.target == 'aarch64-apple-darwin'
+        run: lipo -verify_arch arm64 "$RELEASE_DIR/bundle/macos/Codex Quota Dot.app/Contents/MacOS/codex-quota-dot"
       - name: Prepare Windows assets and checksums
         if: runner.os == 'Windows'
         shell: pwsh
@@ -56,7 +61,7 @@ jobs:
       - name: Create macOS ZIP and checksum
         if: runner.os == 'macOS'
         run: |
-          ditto -c -k --sequesterRsrc --keepParent "src-tauri/target/release/bundle/macos/Codex Quota Dot.app" "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$RELEASE_DIR/bundle/macos/Codex Quota Dot.app" "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip"
           shasum -a 256 "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip" > "Codex-Quota-Dot-${{ inputs.tag || github.ref_name }}-${{ matrix.label }}.zip.sha256"
       - uses: softprops/action-gh-release@v2
         with:
