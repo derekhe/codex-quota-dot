@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.6] - 2026-11-01
+
+- Add an opt-in Start at login switch to the Windows tray and macOS menu bar menu.
+- Read startup registration from the OS and report failures with a retry option.
+- Quote Windows executable paths so startup supports spaces and non-ASCII locations.
+
 ## [0.2.5] - 2026-10-28
 
 - Restore the quota orb to an active display when its saved display is disconnected.

@@ -4,10 +4,10 @@
 
 Codex Quota Dot is a small floating desktop widget for **Codex CLI and Codex Desktop on Windows and macOS**. It shows the quota windows your account actually reports, including remaining usage and reset times, without opening a usage page or signing in again.
 
-[简体中文](README.zh-CN.md) · [Download](https://github.com/Silvren/codex-quota-dot/releases/latest) · [Report a bug](https://github.com/Silvren/codex-quota-dot/issues/new/choose)
+[简体中文](README.zh-CN.md) · [Download](https://github.com/derekhe/codex-quota-dot/releases/latest) · [Report a bug](https://github.com/derekhe/codex-quota-dot/issues/new/choose)
 
-[![Latest release](https://img.shields.io/github/v/release/Silvren/codex-quota-dot)](https://github.com/Silvren/codex-quota-dot/releases/latest)
-[![CI](https://github.com/Silvren/codex-quota-dot/actions/workflows/ci.yml/badge.svg)](https://github.com/Silvren/codex-quota-dot/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/derekhe/codex-quota-dot)](https://github.com/derekhe/codex-quota-dot/releases/latest)
+[![CI](https://github.com/derekhe/codex-quota-dot/actions/workflows/ci.yml/badge.svg)](https://github.com/derekhe/codex-quota-dot/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 > This is an independent open-source project and is not affiliated with or endorsed by OpenAI.
@@ -22,7 +22,7 @@ The surface changes with the active quota window: blue for healthy (`50–100%`)
 
 ## Download
 
-Download the latest build from [GitHub Releases](https://github.com/Silvren/codex-quota-dot/releases/latest):
+Download the latest build from [GitHub Releases](https://github.com/derekhe/codex-quota-dot/releases/latest):
 
 - Windows x64
 - macOS Apple Silicon
@@ -32,7 +32,7 @@ Download the latest build from [GitHub Releases](https://github.com/Silvren/code
 
 ## Current status
 
-`v0.2.4` adapts to the quota periods Codex actually returns, including weekly-only accounts. It retains the compact interface, reset-credit expiration details, and explicit cached/error states. Release packages target Windows x64 and both macOS architectures.
+`v0.2.6` adds an optional **Start at login** switch in the tray menu. It retains support for the quota periods Codex actually returns, including weekly-only accounts, credit balance, and off-screen orb recovery. Release packages target Windows x64 and both macOS architectures.
 
 ### Credit balance
 
@@ -41,10 +41,16 @@ Download the latest build from [GitHub Releases](https://github.com/Silvren/code
 ### Start in three steps
 
 1. Install Codex Desktop or Codex CLI and sign in there. This widget does not ask for your credentials.
-2. Download the package for your OS from [Releases](https://github.com/Silvren/codex-quota-dot/releases/latest). Windows users can choose the installer or extract the portable ZIP; macOS users should choose Apple Silicon or Intel.
+2. Download the package for your OS from [Releases](https://github.com/derekhe/codex-quota-dot/releases/latest). Windows users can choose the installer or extract the portable ZIP; macOS users should choose Apple Silicon or Intel.
 3. Launch Codex Quota Dot. **Drag to move, click to expand, Esc to collapse.** Hover does not open the card.
 
 For CLI-only setups, `codex` must be available on PATH, or set `CODEX_BINARY` to its executable before starting the widget. If both Desktop and CLI are installed, the widget prefers the Desktop binary unless `CODEX_BINARY` is set. Quota availability depends on the account and the installed Codex version.
+
+### Start at login
+
+Right-click the system tray icon on Windows, or open its menu bar menu on macOS, and select **开机自启动 / Start at login**. It is off by default; the checkmark reflects the OS registration. Uncheck it to disable automatic launch. The widget starts as the collapsed orb after you sign in to your computer.
+
+Keep the app in a permanent location before enabling this option (on macOS, move it to Applications first). If you move a portable copy, disable this option before moving it, then enable it from the new location. If the menu reports a failure, click again to retry.
 
 ### What it shows
 
@@ -120,7 +126,7 @@ npm run tauri build
 - Rust/native build verification is required on every target OS; WebView behavior differs across Windows and macOS.
 - Each refresh currently starts a short-lived app-server subprocess. A future release may reuse the supported local daemon transport after lifecycle behavior is validated.
 - Passing macOS builds do not cover every native interaction, multi-monitor layout, or DPI setting.
-- Start-at-login and a full settings screen are intentionally not included; the widget keeps controls limited to language, always-on-top, reset-credit details, and refresh.
+- A full settings screen is not included; start-at-login is available from the tray menu.
 - `consuming` is inferred from a decrease between snapshots. It does not mean a Codex task is definitely running.
 - The provider depends on the installed Codex version exposing the documented app-server account methods. Structural changes fail closed as `Unknown`.
 

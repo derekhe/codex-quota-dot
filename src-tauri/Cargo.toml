@@ -1,6 +1,6 @@
 [package]
 name = "codex-quota-dot"
-version = "0.2.5"
+version = "0.2.6"
 description = "Privacy-first Codex quota desktop indicator"
 authors = ["Codex Quota Dot contributors"]
 edition = "2021"
@@ -22,4 +22,5 @@ tauri = { version = "2", features = ["tray-icon"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }
+auto-launch = "0.5"
 

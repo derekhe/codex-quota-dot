@@ -31,6 +31,7 @@ flowchart LR
 - `src-tauri/src/usage/mod.rs` validates and normalizes provider output.
 - `src/providers/usageProvider.ts` is the UI adapter and exposes labeled mock data only outside Tauri.
 - Tauri capabilities grant window drag/position/size operations; no shell plugin or filesystem permission is exposed.
+- The native tray menu controls start-at-login through `auto-launch`. It reads the OS registration, enables or disables it on request, and restores the checkmark with a retry label on failure. Windows executable paths are quoted for paths containing spaces. No autostart commands are exposed to the renderer.
 
 ## Refresh and activity
 

@@ -4,7 +4,7 @@
 
 Codex Quota Dot 是适用于 **Windows 和 macOS** 的桌面配额悬浮球。配合已登录的 **Codex CLI 或 Codex Desktop**，它会显示账户实际返回的剩余额度与重置时间；有短周期或每周额度，就按实际周期展示。无需反复打开用量页面，也无需在悬浮球里重新登录。
 
-[English](README.md) · [下载最新版](https://github.com/Silvren/codex-quota-dot/releases/latest) · [反馈问题](https://github.com/Silvren/codex-quota-dot/issues/new/choose)
+[English](README.md) · [下载最新版](https://github.com/derekhe/codex-quota-dot/releases/latest) · [反馈问题](https://github.com/derekhe/codex-quota-dot/issues/new/choose)
 
 > 独立开源项目，与 OpenAI 无隶属关系，也未获其背书。
 
@@ -24,7 +24,7 @@ Codex Quota Dot 是适用于 **Windows 和 macOS** 的桌面配额悬浮球。�
 
 ## 下载和使用
 
-从 [GitHub Releases 下载 v0.2.4 或更新版本](https://github.com/Silvren/codex-quota-dot/releases/latest)：
+从 [GitHub Releases 下载 v0.2.6 或更新版本](https://github.com/derekhe/codex-quota-dot/releases/latest)：
 
 | 你的系统 | 选择的文件 |
 | --- | --- |
@@ -35,6 +35,10 @@ Codex Quota Dot 是适用于 **Windows 和 macOS** 的桌面配额悬浮球。�
 1. 安装 Codex Desktop 或 Codex CLI，并在 Codex 中登录。
 2. 安装或解压适合系统的下载包，启动 Codex Quota Dot。
 3. 拖动小球移动，点击展开，按 Esc 收起。卡片右下角可以手动刷新。
+
+**开机自启动**：Windows 右键系统托盘图标，macOS 点击菜单栏图标，勾选 **开机自启动 / Start at login**。默认关闭，勾选状态读取系统启动项；取消勾选即可关闭。启用后，下次登录电脑时会自动显示悬浮球。
+
+启用前请把程序放在固定位置（macOS 请先移至“应用程序”）。便携版移动路径前先关闭自启动，移动后再开启。若菜单提示失败，可再次点击重试。
 
 **只用 Codex CLI 也可以。** 请确保 `codex` 在 PATH 中，或在启动前把 `CODEX_BINARY` 设置为它的可执行文件路径。同时安装 Desktop 和 CLI 时，默认优先使用 Desktop 自带的 Codex；设置 `CODEX_BINARY` 可以明确指定。
 
@@ -68,7 +72,7 @@ Codex 自身可能联网查询额度，因此这不是完全离线工具。更�
 
 ## 反馈和参与
 
-遇到问题请 [提交 Issue](https://github.com/Silvren/codex-quota-dot/issues/new/choose)，附上系统、软件版本和现象即可。不要上传登录令牌或未经检查的账号响应。
+遇到问题请 [提交 Issue](https://github.com/derekhe/codex-quota-dot/issues/new/choose)，附上系统、软件版本和现象即可。不要上传登录令牌或未经检查的账号响应。
 
 想改代码？参见 [开发步骤](README.md#development) 和 [贡献指南](CONTRIBUTING.md)。每个平台的显示缩放和多显示器行为可能不同，欢迎反馈具体使用体验。
 

@@ -18,4 +18,6 @@ The app asks the installed official Codex executable for account state and rate-
 
 The WebView stores the last normalized usage snapshot and window position. The snapshot contains no raw response and no account identity. Clearing WebView site data removes it.
 
+If you enable **Start at login** in the tray menu, the native backend registers the app's executable path with the current user's OS startup mechanism (Windows Run registry entry or macOS LaunchAgent). Disabling the option removes that registration. It is off by default and is independent of WebView site data.
+
 Codex itself may connect to OpenAI when asked for current rate limits. This application does not make that request directly and does not proxy it through any project-controlled service.
