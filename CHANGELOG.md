@@ -1,15 +1,38 @@
 # Changelog
 
+## [0.3.0] - 2026-11-07
+
+- Collapse the expanded card when focus moves to another window or the user clicks outside it.
+- Refine the shared blue, amber and red palette and refresh the README product hero.
+
+- Show the reported weekly quota as a single ring on the orb for all plans, with color based on the remaining percentage.
+- Show `—` when weekly quota data is unavailable; do not fall back to a short-period quota. Keep available short-period and weekly details in the expanded card.
+- Keep the 56 px orb, click-to-expand card, and drag-to-move interaction.
+
 ## [0.2.6] - 2026-11-01
 
 - Add an opt-in Start at login switch to the Windows tray and macOS menu bar menu.
 - Read startup registration from the OS and report failures with a retry option.
 - Quote Windows executable paths so startup supports spaces and non-ASCII locations.
 
-## [0.2.5] - 2026-10-28
+## [0.2.5] (fork) - 2026-10-28
 
 - Restore the quota orb to an active display when its saved display is disconnected.
 - Recover an off-screen orb while the application is running.
+
+## [0.2.5] - 2026-11-07
+
+### Fixed
+
+- Close app-server stdin and allow up to five seconds for a normal exit after quota reads; terminate and reap only children that exceed the deadline. Cleanup also covers failed, timed-out, and signed-out requests. Thanks to @derekhe for [#7](https://github.com/Silvren/codex-quota-dot/pull/7).
+- Add six mock-subprocess regression tests for graceful exit and timeout cleanup.
+
+### Maintenance
+
+- Refresh development dependencies to resolve high-severity npm audit findings.
+- Move Apple Silicon CI and release builds to `macos-15` after the previous runner stopped accepting jobs; run the mock app-server lifecycle tests on Windows and macOS too.
+- Clarify the widget's role alongside Codex's built-in usage display and keep maintenance focused on compatibility and stability.
+- Track the Windows LSASS/RPC report in [#6](https://github.com/Silvren/codex-quota-dot/issues/6). Graceful shutdown addresses the suspected termination race; the underlying crash cause remains open.
 
 ## [0.2.4] - 2026-09-17
 

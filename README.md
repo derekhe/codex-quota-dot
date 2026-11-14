@@ -1,6 +1,6 @@
 # Codex Quota Dot
 
-**Your Codex quota, at a glance.**
+![Codex Quota Dot — your quota, at a glance](assets/codex-quota-dot-hero.png)
 
 Codex Quota Dot is a small floating desktop widget for **Codex CLI and Codex Desktop on Windows and macOS**. It shows the quota windows your account actually reports, including remaining usage and reset times, without opening a usage page or signing in again.
 
@@ -14,11 +14,15 @@ Codex Quota Dot is a small floating desktop widget for **Codex CLI and Codex Des
 
 中文简介：Codex 配额桌面悬浮球，一眼查看账户实际返回的剩余额度与重置时间；支持短周期和每周额度。
 
+## Do you still need it?
+
+If Codex's built-in usage display covers your workflow, you can skip this app. The CLI also offers an in-terminal usage display through [`/statusline`](https://learn.chatgpt.com/docs/developer-commands?surface=cli). Quota Dot is for people who want a small, movable, always-on-top indicator while working in a terminal, editor, or another window. CLI-only setups are supported too.
+
+This remains a small, maintained utility. Updates focus on Codex compatibility, process stability, and useful bug fixes, with no fixed feature-release schedule. The [official usage dashboard and CLI `/status`](https://learn.chatgpt.com/docs/pricing#where-can-i-see-my-current-usage-limits) remain the reference for account limits.
+
 ## Interface preview
 
-![Codex Quota Dot v0.2.4: Plus and Pro quota cards with three colored quota orbs](assets/codex-quota-dot-ui.jpg)
-
-The surface changes with the active quota window: blue for healthy (`50–100%`), amber for caution (`10–50%`), and coral for critical (`0–10%`). If Codex omits the short window, the orb falls back to weekly quota and displays a `周` / `W` marker.
+The orb always shows the reported weekly quota as a single ring, with blue at `50–100%`, amber at `10–<50%`, and coral below `10%`. It does not fall back to a short-period quota when weekly data is unavailable; the ring shows `—`. The expanded card retains the available short-period and weekly quota details.
 
 ## Download
 
@@ -32,7 +36,11 @@ Download the latest build from [GitHub Releases](https://github.com/derekhe/code
 
 ## Current status
 
-`v0.2.6` adds an optional **Start at login** switch in the tray menu. It retains support for the quota periods Codex actually returns, including weekly-only accounts, credit balance, and off-screen orb recovery. Release packages target Windows x64 and both macOS architectures.
+`v0.3.0` adds a weekly quota ring to the 56 px orb. It includes v0.2.5's graceful app-server shutdown fix, development dependency updates, and platform build checks. Thanks to @derekhe for [#7](https://github.com/Silvren/codex-quota-dot/pull/7). Follow-up on the Windows LSASS/RPC crash remains in [#6](https://github.com/Silvren/codex-quota-dot/issues/6).
+
+The widget reads the quota periods Codex returns; the orb uses the weekly window, while the card retains available short-period and weekly details. It also shows credit balances, reset-credit details, and explicit cached/error states. See [maintenance scope](docs/maintenance.md).
+
+The fork also retains an optional **Start at login** switch in the tray menu and off-screen orb recovery. Release packages target Windows x64 and both macOS architectures.
 
 ### Credit balance
 
@@ -61,7 +69,7 @@ Keep the app in a permanent location before enabling this option (on macOS, move
 - best-effort `consuming` / `idle` inference from successive quota changes
 - last-update and honest cached/unknown states
 
-The compact **56 px quota orb** stays on top and shows the active quota percentage. Drag it to reposition and snap it to a screen edge; click it to open the **320 × 256 quota card**. Hover never opens or closes the card. Use the explicit collapse control or press `Esc` to return to the orb. The card includes Chinese/English switching and a clearly indicated always-on-top toggle. Sizes are logical pixels and follow OS display scaling.
+The compact **56 px quota orb** stays on top and shows the weekly quota as a single ring. Drag to reposition and snap to a screen edge; click to open the **320 × 256 quota card**. Hover never opens or closes the card. Use the explicit collapse control or press `Esc` to return to the orb. The card retains available short-period and weekly quota details, plus Chinese/English switching and a clearly indicated always-on-top toggle. Sizes are logical pixels and follow OS display scaling.
 
 The runtime has just three frontend dependencies (React, React DOM and the Tauri API); the three control icons are inline SVG. There is no bundled browser, sync service, mobile client, telemetry, or extra server in this desktop release.
 
@@ -69,13 +77,13 @@ The runtime has just three frontend dependencies (React, React DOM and the Tauri
 
 Codex Quota Dot is not restricted to Plus: it reads the actual quota windows returned for the signed-in account, including Pro. Their presence and duration can vary by plan, workspace, promotion, and rollout.
 
-- With multiple usable windows, the shortest reported period is the main display and the other appears in the footer. Labels follow the reported duration rather than assuming five hours.
-- With only a weekly window, the orb displays the weekly value with a `周` / `W` marker. The card shows the weekly percentage, countdown, and local reset date/time; it does not show a misleading missing-five-hour warning.
+- The orb shows the reported weekly window for every plan. The card retains available short-period and weekly quota details; labels follow the reported duration rather than assuming five hours.
+- If weekly data is missing, the orb shows `—` instead of falling back to a short-period value. Missing windows are not interpreted as unlimited usage or 100% remaining.
 - Other reported durations are supported too. A window without a duration is labeled simply “Quota remaining”.
 - With no usable percentage, the app stays neutral and shows unavailable data. Missing windows are **not** interpreted as unlimited usage, 100% remaining, or a failed login.
 - Older cached snapshots remain readable and are clearly marked as saved data.
 
-中文说明：Plus、Pro 等套餐统一按实际返回的额度周期显示。没有五小时窗口但有周额度时，正常展示周额度和重置时间；没有返回数据不等于无限额度。
+中文说明：Plus、Pro 等套餐的小球统一显示实际返回的周额度。缺少周额度数据时显示 `—`，不回退到短周期额度；卡片仍保留实际返回的短周期和周额度详情。
 
 This project does not claim that OpenAI has permanently or universally removed a specific quota window. See [official pricing and usage guidance](https://learn.chatgpt.com/docs/pricing).
 
@@ -124,7 +132,7 @@ npm run tauri build
 ## Known limitations
 
 - Rust/native build verification is required on every target OS; WebView behavior differs across Windows and macOS.
-- Each refresh currently starts a short-lived app-server subprocess. A future release may reuse the supported local daemon transport after lifecycle behavior is validated.
+- Each refresh starts a short-lived app-server subprocess and closes it gracefully, with a five-second fallback deadline. A persistent connection needs separate lifecycle validation.
 - Passing macOS builds do not cover every native interaction, multi-monitor layout, or DPI setting.
 - A full settings screen is not included; start-at-login is available from the tray menu.
 - `consuming` is inferred from a decrease between snapshots. It does not mean a Codex task is definitely running.
